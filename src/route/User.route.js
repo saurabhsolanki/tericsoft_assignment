@@ -25,15 +25,16 @@ app.post('/signup', async (req, res) => {
     try {
         const { name,email, password} = req.body;
         const getuser = await User.findOne({ email });
+
+        // here we are checking if given email is already exist or not if that email is already in database then we are showing then alert that this email is already used by some user
         if (getuser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
         else{
-          
+          // if email is fresh then we are creating a new user account with given details
           const user = await User.create({ name,email,password});
           console.log('user: ', user);
-
           return res.status(201).send({ message : 'User Registered Successfully' });
         }
            
@@ -50,14 +51,19 @@ app.post('/login',async (req, res) => {
     try {
         const user = await User.findOne({ email });
         console.log('user: ', user);
+
+        //here we are checking if user exist or not if user does not exit then we are showing them a message that with this email Id there is no account so please register first
         if (!user) {
-            return res.status(400).send({ message: 'User does not exist' });
-        }
-        if (user.password !== password) {
-            return res.status(400).send({ message: 'Password is incorrect' });
+            return res.status(400).send({ message: 'User does not exist, Please register First' });
         }
 
-        const token = jwt.sign({ _id: user._id,name:user.name}, 'SECRET1234', { expiresIn: '7 days' });
+        // here we are checking the request password is matching or not matching to the user email password, if they are not matched then we are showing them message that your typed password in incorrect please type correct password
+        if (user.password !== password) {
+            return res.status(400).send({ message: 'Password is incorrect, Please Check again' });
+        }
+
+        // here we are creating a token with the help of JWT and putting the informatin of the user 
+        const token = jwt.sign({ _id: user._id,name:user.name}, 'SECRET1234', { expiresIn: '1 days' });
         res.cookie("usercookie",token,{
           expires:new Date(Date.now()+9000000),
           httpOnly:true

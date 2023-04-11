@@ -3,8 +3,8 @@ const BMI = require("../model/BMI.model");
 const {isAuth}=require('../middleware/authentication')
 
 const app = express.Router();
-// app.use(isAuth)
 
+// this api is for get all the BMI data of a particular user with the help  of auth middleware
 app.get("/", isAuth,async (req, res) => {
   try {
     let items = await BMI.find({ user: req.userId }).populate([
@@ -18,8 +18,8 @@ app.get("/", isAuth,async (req, res) => {
 });
 
 
+// this is for storing the BMI data of a partcular user with the help of middleware
 app.post("/", isAuth,async (req, res) => {
-    const {height,weight}=req.body
 
     try {
         let items = await BMI.create({ ...req.body, user: req.userId });
@@ -32,7 +32,7 @@ app.post("/", isAuth,async (req, res) => {
 
 
 
-    // delete the user
+    // here we are deleting the bmi data
 app.delete("/:id", async (req, res) => {
   try {
     const user = await BMI.findByIdAndDelete(req.params.id);
